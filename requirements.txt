@@ -1,0 +1,8 @@
+torch
+transformers
+datasets
+accelerate
+bitsandbytes
+peft
+unsloth
+pyarrow==14.0.2
