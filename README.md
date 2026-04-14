@@ -1,12 +1,15 @@
 # LLM Systems Engineer Assessment
 
-**Name:** Sakthivel S M
-**Degree:** B.Tech Final Year — Artificial Intelligence & Data Science
-**Email:** [s.m.sakthivelofficial@gmail.com](mailto:s.m.sakthivelofficial@gmail.com)
 
-**GitHub Repository:** https://github.com/SAKTHIVEL-SEENIVASAN/LLM-Engineer
-**Colab Notebook:** https://colab.research.google.com/drive/1AWASLhBwxpTDOHGYlXepiK67bsmnIwtF?usp=sharing
+| Field | Details |
+|------|--------|
+| Name | Sakthivel S M |
+| Degree | B.Tech Final Year — AI & Data Science |
+| Email | s.m.sakthivelofficial@gmail.com |
+| GitHub | https://github.com/SAKTHIVEL-SEENIVASAN/LLM-Engineer |
+| Colab | https://colab.research.google.com/drive/1AWASLhBwxpTDOHGYlXepiK67bsmnIwtF?usp=sharing |
 
+---
 ---
 
 ## Overview
