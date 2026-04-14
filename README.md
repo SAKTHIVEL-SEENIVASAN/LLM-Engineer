@@ -1,210 +1,228 @@
-# LLM Systems Engineer Assessment  
-**Name:** Sakthivel S M  
-**Role:** Junior LLM Engineer Candidate  
+#  LLM Systems Engineer Assessment
+
+**Name:** Sakthivel S M
+**B.Tech (Final Year) — Artificial Intelligence & Data Science**
+ [s.m.sakthivelofficial@gmail.com](mailto:s.m.sakthivelofficial@gmail.com)
 
 ---
 
-# Task 4: Analysis & Creative Thinking
+##  Overview
+
+This project demonstrates an end-to-end **LLM systems pipeline** covering:
+
+* Model architecture parsing
+* Efficient fine-tuning using LoRA
+* Model composition via adapter merging
+* Performance evaluation
+* System design thinking and scalability
+
+The goal is to move beyond simple model usage and build a **practical, extensible LLM system**.
 
 ---
 
-## 1. Design Decisions
+## Task 1: Model Architecture Parsing
 
-### Parser Structure
+A **recursive parser** was implemented to analyze internal model structure.
 
-I designed the model parser using a **recursive modular traversal approach**, where each PyTorch module is treated as a node in a hierarchical tree structure.
+### Key Features:
 
-Each node contains:
-- Module type
-- Semantic category (attention, MLP, normalization, etc.)
-- Parameter count (non-recursive to avoid duplication)
-- Architecture-specific metadata
-- Child modules
+* Traverses PyTorch modules hierarchically
+* Classifies components:
 
-### Why this approach?
+  * Attention layers
+  * MLP blocks
+  * Normalization layers
+  * Embeddings
+* Outputs:
 
-This design mirrors the internal structure of transformer models and enables:
+  * Tree-style visualization
+  * JSON representation
 
-- **Interpretability**: Clear visualization of model architecture  
-- **Comparability**: Easy alignment across models (GPT-2 vs TinyLlama)  
-- **Extensibility**: Can plug into merging or analysis pipelines  
+### Design Choice:
 
-### Trade-offs
+A recursive approach ensures flexibility across different architectures without hardcoding model-specific logic.
 
-| Aspect | Choice | Trade-off |
-|------|--------|----------|
-| Readability | Nested dictionary | Slightly larger JSON size |
-| Performance | Recursive traversal | Minor overhead for deep models |
-| Generalization | Name-based classification | Less precise than manual mapping |
+### Result:
 
----
+Successfully extracted structured representations for:
 
-## 2. Working Conditions
-
-### Hardware Used
-
-- GPU: Tesla T4 (Colab)
-- VRAM: ~15 GB
-- RAM: ~12 GB
-
-### Time Taken
-
-| Step | Time |
-|------|------|
-| Task 1 (Parsing) | ~1–2 minutes |
-| Task 2 (Training) | ~6 minutes |
-| Task 3 (Evaluation) | ~4–5 minutes |
-
-### Bottlenecks Faced
-
-#### 1. VRAM Constraints
-- Large models exceeded memory limits  
-- Solved using:
-  - 4-bit quantization (`load_in_4bit=True`)
-  - Gradient checkpointing  
-
-#### 2. PyArrow Compatibility Issue
-- Dataset loading failed due to binary mismatch  
-- Fixed by pinning:
-  - `pyarrow==14.0.2`
-  - `datasets==2.19.0`
-
-#### 3. Colab Ephemeral Storage
-- Models were lost after runtime restart  
-- Solved by saving models to **Google Drive**
+* GPT-2
+* TinyLlama
 
 ---
 
-## 3. Extensibility & Scalability
+##  Task 2: LoRA Fine-Tuning
 
-### Scaling to 10–50 Models
+Fine-tuning was performed on **TinyLlama-1.1B-Chat** using **PEFT (LoRA)**.
 
-To scale this system:
-- Store parsed outputs in structured JSON format  
-- Use batch processing pipelines  
-- Maintain a registry of model architectures  
+### Setup:
 
-### What breaks first?
+* Dataset: IMDB (sentiment classification)
+* Training: 1–3 epochs
+* Optimizations:
 
-- **Memory (VRAM/RAM)** during loading multiple models  
-- **Disk storage** for large merged models  
-- **Evaluation latency** due to sequential generation  
+  * 4-bit quantization
+  * Gradient checkpointing
 
-### Handling Different Architectures (Llama vs Qwen)
+### Key Insight:
 
-- Use **class-name-based abstraction** instead of hardcoding  
-- Normalize architecture into common categories:
-  - attention
-  - mlp
-  - normalization  
-- Build adapter layers for architecture-specific differences  
+LoRA updates only a small subset of parameters, enabling efficient training on limited hardware.
+
+### Result:
+
+The model successfully adapted to the sentiment classification task with minimal resource usage.
 
 ---
 
-## 4. Creativity & Future Vision 
+##  Task 3: Model Composition & Evaluation
 
-### Idea 1: Self-Improving Model Pipeline
+The LoRA adapter was merged into the base model and evaluated.
 
-A system that continuously:
+### Evaluation Setup:
 
-               Parse → Evaluate → Identify Weakness → Fine-tune → Merge
+* Prompt-based classification
+* 50-sample test subset
+* Deterministic generation
 
+### Results:
 
-- Automatically detects performance gaps  
-- Applies targeted LoRA updates  
-- Evolves model over time  
+| Model            | Accuracy |
+| ---------------- | -------- |
+| Base TinyLlama   | 26%      |
+| Fine-tuned Model | 100%     |
+| Improvement      | +74%     |
 
----
+### Interpretation:
 
-### Idea 2: Layer-Level Specialization
+* Base model lacks task-specific understanding
+* Fine-tuned model demonstrates strong adaptation
+* Significant improvement confirms effectiveness of LoRA
 
-Instead of full fine-tuning:
-- Identify weak layers (e.g., attention heads)
-- Apply **selective LoRA tuning**
-
- More efficient and targeted learning
-
----
-
-### Idea 3: Multi-Model Composition Engine
-
-- Combine strengths of multiple models  
-- Example:
-  - Model A → reasoning  
-  - Model B → sentiment  
-- Merge specialized adapters dynamically  
+ *Note: Evaluation was performed on a small subset; larger evaluation is required for full generalization validation.*
 
 ---
 
-### Unique Twist (Most People Miss)
+##  Working Conditions
 
- **Prompt Consistency as a First-Class Component**
+* Environment: Google Colab
+* GPU: Tesla T4
+* RAM: ~12 GB
 
-Most failures in fine-tuning come from:
-- mismatch between training and inference prompts
+### Execution Time:
 
-I ensured:
-- identical prompt template across training & evaluation  
-- which significantly improved performance (~98%)
+* Parsing: ~1–2 minutes
+* Training: ~5–8 minutes
+* Evaluation: ~3–5 minutes
 
----
+### Challenges Faced:
 
-## 5. Honest Reflection
+* GPU memory constraints
+* PyArrow compatibility issues
+* Colab session resets (model persistence)
 
-### Straightforward Parts
+### Solutions:
 
-- Model parsing using recursion  
-- LoRA setup using PEFT  
-
-### Challenging Parts
-
-- Handling memory constraints during training  
-- Correctly merging 4-bit trained models into float16  
-- Ensuring prompt-label alignment  
-
-### External Help
-
-- Used:
-  - HuggingFace documentation  
-  - Unsloth documentation  
-  - LLM assistance for debugging  
-
-### Making it My Own
-
-- Improved parameter counting logic (avoiding duplication)  
-- Implemented label masking for correct training  
-- Designed evaluation pipeline with robust label extraction  
-- Handled real-world issues (Colab resets, dependency conflicts)
+* 4-bit quantization
+* Dependency version control
+* Saving models to Google Drive
 
 ---
 
-#  Results Summary
+##  Extensibility & Scalability
 
-| Model | Accuracy |
-|------|--------|
-| Base TinyLlama | ~55–65% |
-| Fine-tuned Model | ~90–98% |
+### Scaling to Multiple Models:
 
-Significant improvement using LoRA fine-tuning on small dataset
+* Store parsed outputs as structured JSON
+* Use modular pipelines for batch processing
+* Maintain architecture abstraction layer
+
+### Potential Bottlenecks:
+
+* GPU memory (VRAM)
+* Inference latency
+* Storage for large models
+
+### Handling Different Architectures:
+
+* Use class-based abstraction instead of hardcoding
+* Normalize components into common categories:
+
+  * attention
+  * mlp
+  * normalization
 
 ---
 
-# Deliverables
+##  Creativity & Future Vision
 
-- Jupyter Notebook (Task 1 + Task 2)
-- Jupyter Notebook (Task 3)
-- requirements.txt
-- README.md (this file)
-- Google Drive saved model
+### 1. Self-Improving Model Pipeline
+
+Automated loop:
+
+```
+Parse → Evaluate → Identify Weakness → Fine-tune → Merge
+```
+
+Enables continuous model improvement.
+
+### 2. Selective Layer Fine-Tuning
+
+Instead of full LoRA:
+
+* Identify weak layers
+* Apply targeted adaptation
+
+### 3. Multi-Model Composition
+
+Combine strengths of multiple models:
+
+* Model A → reasoning
+* Model B → classification
 
 ---
 
-#  Conclusion
+###  Unique Insight
+
+Ensuring **prompt consistency** between training and evaluation significantly improves performance.
+Misaligned prompts are a common but overlooked source of failure in LLM systems.
+
+---
+
+##  Honest Reflection
+
+### Straightforward:
+
+* Recursive model parsing
+* LoRA integration using PEFT
+
+### Challenging:
+
+* Memory optimization during training
+* Dependency conflicts (pyarrow)
+* Ensuring correct evaluation logic
+
+### External Help:
+
+* HuggingFace documentation
+* Debugging with LLM assistance
+
+### Personal Contribution:
+
+* Improved parser design
+* Built evaluation pipeline
+* Resolved real-world system issues
+
+---
+
+##  Conclusion
 
 This project demonstrates:
-- Strong understanding of model architecture  
-- Practical fine-tuning using LoRA  
-- Systems thinking (memory, scalability, reproducibility)  
-- Ability to debug real-world ML issues  
 
----               
+* Strong understanding of LLM architecture
+* Practical fine-tuning under constraints
+* Effective model composition
+* Systems-level thinking
+
+ Achieved **+74% improvement**, showcasing the power of efficient adaptation techniques like LoRA.
+
+---
